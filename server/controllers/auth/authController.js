@@ -1,4 +1,6 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import "../../loadEnvironment.js";
 import { userSignupService } from "../../services/auth/authService.js";
 import db from "../../config/dbConn.js";
 
@@ -40,6 +42,44 @@ export const userSignupController = async (req, res) => {
     console.error(err);
     res.json(500).json({
       message: "An error occured while creating an account. Please try again.",
+    });
+  }
+};
+
+export const userLoginController = async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(412).json({ message: "Please fill all required fields" });
+  }
+
+  try {
+    const userCollection = db.collection("user");
+    const existingUser = await userCollection.findOne({
+      email: req.body.email,
+    });
+
+    if (!existingUser) {
+      res.status(400).json({ message: "Invalid email or password" });
+    }
+    const isMatch = await bcrypt.compare(
+      req.body.password,
+      existingUser.password,
+    );
+
+    if (!isMatch) {
+      res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { email: existingUser.email },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" },
+    );
+
+    res.status(200).json({ message: "Log in successful", token });
+  } catch (err) {
+    console.error(err);
+    res.json(500).json({
+      message: "An error occured while trying to log in. Please try again.",
     });
   }
 };
