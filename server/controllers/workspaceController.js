@@ -1,6 +1,6 @@
-import { createWorkSpaceService } from "../services/workspaceService";
+import { createWorkspaceService } from "../services/workspaceService";
 
-export const createWorkSpaceController = async (req, res) => {
+export const createWorkspaceController = async (req, res) => {
   const user = req.user;
 
   if (!req.body.name || !req.body.slug) {
@@ -8,16 +8,14 @@ export const createWorkSpaceController = async (req, res) => {
   }
 
   try {
-    const createdWorkspace = await createWorkSpaceController({
+    const createdWorkspace = await createWorkspaceService({
       ...req.body,
       createdBy: user._id,
     });
-    res
-      .status(201)
-      .json({
-        message: "Workspace created successfully",
-        data: createdWorkspace,
-      });
+    res.status(201).json({
+      message: "Workspace created successfully",
+      data: createdWorkspace,
+    });
   } catch (err) {
     console.error(err);
     res.json(500).json({
