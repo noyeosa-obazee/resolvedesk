@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import "../../loadEnvironment.js";
-import { userSignupService } from "../../services/auth/authService.js";
-import db from "../../config/dbConn.js";
+import "../loadEnvironment.js";
+import { userSignupService } from "../services/authService.js";
+import User from "../model/User.js";
 
 export const userSignupController = async (req, res) => {
   if (
@@ -37,7 +37,9 @@ export const userSignupController = async (req, res) => {
       ...req.body,
       password: hashedPassword,
     });
-    res.status(201).json({ message: "User created successfully", createdUser });
+    res
+      .status(201)
+      .json({ message: "User created successfully", data: createdUser });
   } catch (err) {
     console.error(err);
     res.json(500).json({
@@ -52,8 +54,7 @@ export const userLoginController = async (req, res) => {
   }
 
   try {
-    const userCollection = db.collection("user");
-    const existingUser = await userCollection.findOne({
+    const existingUser = await User.findOne({
       email: req.body.email,
     });
 
