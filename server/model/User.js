@@ -7,6 +7,8 @@ const user = new Schema(
     lastName: String,
     email: String,
     password: String,
+    otp: String,
+    otpExpire: Date,
   },
   {
     timestamps: true,

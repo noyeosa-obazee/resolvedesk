@@ -1,11 +1,15 @@
 import { Router } from "express";
 import { validateUser } from "../middleware/authMiddleware";
-import { createWorkspaceController } from "../controllers/workspaceController";
+import {
+  createWorkspaceController,
+  addWorkspaceController,
+} from "../controllers/workspaceController";
 
 const router = Router();
 
 router.use(validateUser);
 
-router.post("/", createWorkspaceController);
+router.post("/new", createWorkspaceController);
+router.post("/add", addWorkspaceController);
 
 export default router;

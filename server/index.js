@@ -4,7 +4,10 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import workspaceRoutes from "./routes/workspaceRoutes.js";
 
-mongoose.connect(process.env.ATLAS_URI);
+mongoose
+  .connect(process.env.ATLAS_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error(err));
 
 const app = express();
 const PORT = 3000;
