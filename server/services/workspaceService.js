@@ -1,5 +1,5 @@
-import Workspace from "../model/Workspace";
-import Membership from "../model/Membership";
+import Workspace from "../model/Workspace.js";
+import Membership from "../model/Membership.js";
 
 export const createWorkspaceService = async (data) => {
   const result = await Workspace.create(data);

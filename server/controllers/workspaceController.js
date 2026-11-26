@@ -1,14 +1,14 @@
 import {
   createWorkspaceService,
   addToWorkspaceService,
-} from "../services/workspaceService";
-import Membership from "../model/Membership";
+} from "../services/workspaceService.js";
+import Membership from "../model/Membership.js";
 
 export const createWorkspaceController = async (req, res) => {
   const user = req.user;
 
   if (!req.body.name || !req.body.slug) {
-    res.status(412).json({ message: "Please fill all required fields" });
+    return res.status(412).json({ message: "Please fill all required fields" });
   }
 
   try {
@@ -16,24 +16,24 @@ export const createWorkspaceController = async (req, res) => {
       ...req.body,
       createdBy: user._id,
     });
-    res.status(201).json({
+    return res.status(201).json({
       message: "Workspace created successfully",
       data: createdWorkspace,
     });
   } catch (err) {
     console.error(err);
-    res.json(500).json({
+    return res.json(500).json({
       message: "An error occured while creating a workspace. Please try again.",
     });
   }
 };
 
-export const addWorkspaceController = async (req, res) => {
+export const addToWorkspaceController = async (req, res) => {
   const user = req.user;
   try {
     const existingMembership = await Membership.findOne({ userId: user._id });
     if (existingMembership) {
-      res
+      return res
         .status(409)
         .json({ message: "User is already a member of this workspace" });
     }
@@ -43,12 +43,12 @@ export const addWorkspaceController = async (req, res) => {
       user._id,
       req.body.role,
     );
-    res.status(200).json({
+    return res.status(200).json({
       message: "User added to workspace successfully",
       data: newMembership,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

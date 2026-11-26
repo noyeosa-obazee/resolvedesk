@@ -13,16 +13,15 @@ export const userSignupController = async (req, res) => {
     !req.body.email ||
     !req.body.password
   ) {
-    res.status(412).json({ message: "Please fill all required fields" });
+    return res.status(412).json({ message: "Please fill all required fields" });
   }
 
   try {
-    const userCollection = db.collection("user");
-    const existingUser = await userCollection.findOne({
+    const existingUser = await User.findOne({
       email: req.body.email,
     });
     if (existingUser) {
-      res
+      return res
         .status(409)
         .json({ message: "A user with this email already exists" });
     }
@@ -32,16 +31,17 @@ export const userSignupController = async (req, res) => {
     const newUser = await userSignupService({
       ...req.body,
       password: hashedPassword,
+      isEmailVerified: false,
       otp,
       otpExpire: new Date(Date.now() + 10 * 60 * 1000),
     });
     await sendOTP(req.body.email, otp);
-    res.status(201).json({
+    return res.status(201).json({
       message: "Registration successful. Please verify your email using OTP.",
     });
   } catch (err) {
     console.error(err);
-    res.json(500).json({
+    return res.json(500).json({
       message: "Registration failed",
     });
   }
@@ -51,21 +51,23 @@ export const validateOTP = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (req.body.otp !== user.otp) {
-      res.status(412).json({ message: "Invalid OTP" });
+      return res.status(412).json({ message: "Invalid OTP" });
     }
     if (user.otpExpire < new Date()) {
-      res.status(412).json({ message: "OTP expired" });
+      return res.status(412).json({ message: "OTP expired" });
     }
-    res.status(200).json({ message: "OTP validated successfully" });
+    user.isEmailVerified = true;
+    await user.save();
+    return res.status(200).json({ message: "OTP validated successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "OTP validation failed" });
+    return res.status(500).json({ message: "OTP validation failed" });
   }
 };
 
 export const userLoginController = async (req, res) => {
   if (!req.body.email || !req.body.password) {
-    res.status(412).json({ message: "Please fill all required fields" });
+    return res.status(412).json({ message: "Please fill all required fields" });
   }
 
   try {
@@ -74,7 +76,7 @@ export const userLoginController = async (req, res) => {
     });
 
     if (!existingUser) {
-      res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     const isMatch = await bcrypt.compare(
       req.body.password,
@@ -82,7 +84,7 @@ export const userLoginController = async (req, res) => {
     );
 
     if (!isMatch) {
-      res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const token = jwt.sign(
@@ -91,10 +93,10 @@ export const userLoginController = async (req, res) => {
       { expiresIn: "1h" },
     );
 
-    res.status(200).json({ message: "Log in successful", token });
+    return res.status(200).json({ message: "Log in successful", token });
   } catch (err) {
     console.error(err);
-    res.json(500).json({
+    return res.json(500).json({
       message: "An error occured while trying to log in. Please try again.",
     });
   }

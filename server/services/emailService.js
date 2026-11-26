@@ -12,10 +12,11 @@ export const sendOTP = async (email, otp) => {
   });
 
   const mailOptions = {
-    from: "Your App <noreply@yourapp.com>",
+    from: "Your App <noreply@resolvedesk.com>",
     to: email,
     subject: "OTP Verification",
     text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
+    html: `<h2>Your OTP is ${otp}. It will expire in 10 minutes.<h2>`,
   };
 
   await transporter.sendMail(mailOptions);

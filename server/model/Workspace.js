@@ -6,7 +6,7 @@ const workspace = new Schema(
     name: String,
     slug: String,
     description: String,
-    createdBy: ObjectId,
+    createdBy: Schema.Types.ObjectId,
   },
   {
     timestamps: true,

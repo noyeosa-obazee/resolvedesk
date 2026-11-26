@@ -3,8 +3,8 @@ const { Schema, model } = mongoose;
 
 const membership = new Schema(
   {
-    workspaceId: ObjectId,
-    userId: ObjectId,
+    workspaceId: Schema.Types.ObjectId,
+    userId: Schema.Types.ObjectId,
     role: String,
     status: String,
   },

@@ -3,8 +3,8 @@ const { Schema, model } = mongoose;
 
 const ticket = new Schema(
   {
-    workspaceId: ObjectId,
-    customerId: ObjectId,
+    workspaceId: Schema.Types.ObjectId,
+    customerId: Schema.Types.ObjectId,
     subject: String,
     status: String,
   },
