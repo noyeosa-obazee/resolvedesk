@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-router.post("/user", userSignupController);
+router.post("/signup", userSignupController);
 router.post("/login", userLoginController);
 router.post("/verify-otp", validateOTP);
 
