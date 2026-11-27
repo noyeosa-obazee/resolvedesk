@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateUser } from "../middleware/authMiddleware.js";
-import { checkIsWorkspaceAdmin } from "../middleware/checkPermissionsMiddleware.js";
+import { checkUserWorkspaceRole } from "../middleware/checkPermissionsMiddleware.js";
 import {
   createWorkspaceController,
   addToWorkspaceController,
@@ -15,7 +15,7 @@ router.post("/new", createWorkspaceController);
 router.post("/add", addToWorkspaceController);
 router.put(
   "/edit/:workspaceId",
-  checkIsWorkspaceAdmin,
+  checkUserWorkspaceRole,
   editWorksapceController,
 );
 

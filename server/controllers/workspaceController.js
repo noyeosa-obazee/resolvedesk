@@ -63,8 +63,14 @@ export const editWorksapceController = async (req, res) => {
     return res.status(412).json({ message: "No fields to update" });
   }
 
+  if (req.body.userWorkspaceRole !== "admin") {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized. Only admins can edit this workspace" });
+  }
+
   try {
-    const workspace = req.body.workspace;
+    const workspace = await Workspace.findById(req.params.workspaceId);
 
     if (req.body.name) {
       workspace.name = req.body.name;

@@ -1,27 +1,35 @@
 import Workspace from "../model/Workspace";
 import Membership from "../model/Membership";
 
-export const checkIsWorkspaceAdmin = async (req, res, next) => {
+export const checkUserWorkspaceRole = async (req, res, next) => {
   const user = req.user;
+  let workspace;
 
   try {
-    const workspace = await Workspace.findById(req.params.workspaceId);
+    if (req.params.workspaceId) {
+      workspace = await Workspace.findById(req.params.workspaceId);
+    } else if (req.body.workspaceId) {
+      workspace = await Workspace.findById(req.body.workspaceId);
+    } else if (req.query.workspaceId) {
+      workspace = await Workspace.findById(req.query.workspaceId);
+    } else {
+      return res.status(400).json({ message: "Please provide workspace id" });
+    }
 
     if (!workspace) {
       return res.status(404).json({ message: "Workspace does not exist" });
     }
 
-    const workspaceAdmin = await Membership.findOne({
+    const workspaceMembership = await Membership.findOne({
       userId: user._id,
       workspaceId: workspace._id,
-      role: "admin",
     });
-    if (!workspaceAdmin) {
+    if (!workspaceMembership) {
       return res.status(401).json({
-        message: "Unauthorized. Only workspace admins can edit this workspace",
+        message: "Unauthorized. You are not a member of this workspace",
       });
     }
-    req.body.workspace = workspace;
+    req.body.userWorkspaceRole = workspaceMembership.role;
     next();
   } catch (err) {
     console.error(err);
